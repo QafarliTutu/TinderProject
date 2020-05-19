@@ -1,6 +1,5 @@
 package dao;
 
-import db.DbConn;
 import entity.User;
 
 import java.sql.Connection;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UserDao implements DAO<User> {
+public class UserDao implements DAOUser<User> {
     private Connection connection;
 
     public UserDao(Connection connection) {
@@ -120,16 +119,35 @@ public class UserDao implements DAO<User> {
         PreparedStatement ps;
         ResultSet rs;
         ArrayList<User> users = new ArrayList<>();
-        try{
-            ps=connection.prepareStatement(SqlQuery.GET_ALL_LIKED_USERS);
-            ps.setLong(1,id);
-             rs = ps.executeQuery();
-             while (rs.next()){
-                 users.add(getUserFromResultSet(rs));
-             }
+        try {
+            ps = connection.prepareStatement(SqlQuery.GET_ALL_LIKED_USERS);
+            ps.setLong(1, id);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                users.add(getUserFromResultSet(rs));
+            }
         } catch (SQLException e) {
             throw new RuntimeException("smth went wrong");
         }
         return users;
     }
-}
+
+    @Override
+    public Optional<User> get(int id) {
+            PreparedStatement ps;
+            ResultSet rs;
+            try {
+                ps = connection.prepareStatement(SqlQuery.GET_USER_BY_ID);
+                ps.setLong(1, id);
+                rs = ps.executeQuery();
+                return !rs.next() ? Optional.empty() : Optional.of(
+                        getUserFromResultSet(rs)
+                );
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException("smth went wrong");
+            }
+
+        }
+    }
+

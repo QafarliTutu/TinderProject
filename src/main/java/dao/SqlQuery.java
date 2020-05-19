@@ -22,7 +22,7 @@ public class SqlQuery {
 
     public static final String INSERT_MESSAGE = "insert into messages (from_user, to_user, content) VALUES (?, ?, ?)";
 
-    public static final String GET_MESSAGES = "select m.from_user, concat(t.name,' ',t.surname) full_name, m.content from " +
+    public static final String GET_MESSAGES = "select m.from_user,  m.content from " +
             " messages m " +
             "join users f on f.id=m.from_user " +
             "join users t on t.id= m.to_user " +

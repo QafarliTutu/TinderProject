@@ -35,17 +35,7 @@ public class User {
         this.lastLogin = lastLogin;
         this.dayAgo = dayAgo;
     }
-/*
-*    rs.getInt("id"),
-                rs.getString("name"),
-                rs.getString("surname"),
-                rs.getString("email"),
-                rs.getString("job"),
-                rs.getTimestamp("last_login").toLocalDateTime(),
-                rs.getString("password"),
-                rs.getString("day"),
-                rs.getString("photo")
-* */
+
     public long getId() {
         return id;
     }

@@ -1,14 +1,17 @@
+import dao.MessageDao;
 import dao.UserDao;
 import db.ConnDetails;
 import db.DbConn;
 import db.DbSetup;
 import filter.LikedFilter;
 import filter.LoginFilter;
+import filter.MessagesFilter;
 import filter.UsersFilter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import service.MessageService;
 import service.UserService;
 import servlet.*;
 import support.StaticContentServlet;
@@ -24,7 +27,9 @@ public class ServerApp {
     public static void main(String[] args) throws Exception {
         //DbSetup.migrate(ConnDetails.url, ConnDetails.username, ConnDetails.password);
 
-        Connection connection = DbConn.create(ConnDetails.url, ConnDetails.username, ConnDetails.password);
+     // Connection connection = DbConn.create(ConnDetails.url, ConnDetails.username, ConnDetails.password);
+
+        Connection connection = DbConn.createFromURL(HerokuEnv.jdbc_url(),HerokuEnv.jdbc_username(),HerokuEnv.jdbc_password());
 
         Server server = new Server(HerokuEnv.port());
         TemplateEngine engine = TemplateEngine.folder("./templates");
@@ -35,11 +40,15 @@ public class ServerApp {
         handler.addServlet(LoginServlet.class, "/login/*");
         handler.addServlet(new ServletHolder(new UsersServlet(new UserService(new UserDao(connection)), engine)), "/users/*");
         handler.addServlet(new ServletHolder(new LikedServlet(new UserService(new UserDao(connection)), engine)), "/liked/*");
-
+        handler.addServlet(new ServletHolder(new MessagesServlet(engine,
+                new MessageService(new MessageDao(connection)),
+                new UserService(new UserDao(connection)))),"/messages/*");
+        handler.addServlet(LogoutServlet.class,"/logout/*");
 
         handler.addFilter(new FilterHolder(new LoginFilter(new UserService(new UserDao(connection)))), "/login/*", ft);
         handler.addFilter(new FilterHolder(new UsersFilter()), "/users/*", ft);
         handler.addFilter(LikedFilter.class, "/liked/*", ft);
+        handler.addFilter(MessagesFilter.class,"/messages/*", ft);
 
         server.setHandler(handler);
         server.start();

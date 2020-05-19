@@ -1,15 +1,15 @@
 package service;
 
-import dao.DAO;
+import dao.DAOUser;
 import entity.User;
 
 import java.util.List;
 import java.util.Optional;
 
 public class UserService {
-private DAO dao;
+private DAOUser<User> dao;
 
-    public UserService(DAO dao) {
+    public UserService(DAOUser<User> dao) {
         this.dao = dao;
     }
 
@@ -32,5 +32,9 @@ private DAO dao;
 
     public List<User> getLikedUsersList(long id) {
         return dao.getLikedUsersList(id);
+    }
+
+    public Optional<User> get(int id) {
+        return dao.get(id);
     }
 }
